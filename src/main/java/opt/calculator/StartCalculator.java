@@ -2,9 +2,14 @@ package opt.calculator;
 
 import opt.calculator.service.CalculatorService;
 
+import java.util.Scanner;
+
 public class StartCalculator {
     public static void main(String[] args) {
+        Scanner in = new Scanner(System.in);
         CalculatorService calculatorService = new CalculatorService();
-        calculatorService.calculate("5.23+5+10+(5+10*5*(5-5.98*10/2+(5+5)*5)+(5-5)/-2.2)");
+        System.out.println("Input mathematical expression");
+        String mathematicalExpression = in.nextLine();
+        System.out.println("Result is: "+calculatorService.calculate(mathematicalExpression));
     }
 }
