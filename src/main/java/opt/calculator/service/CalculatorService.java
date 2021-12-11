@@ -7,14 +7,14 @@ public class CalculatorService {
 
     public double calculate(String mathematicalExpression) {
 
-        String parenthesis = "";
-        String operation = "";
+        String parenthesis;
+        String operation;
         while (true) {
             parenthesis = findParenthesis(mathematicalExpression);
             if (parenthesis.equals("Not found")) break;
             operation = findeOperations(parenthesis);
-            mathematicalExpression = replaceString(mathematicalExpression, parenthesis, operation);
-            mathematicalExpression = replaceString(mathematicalExpression, "+-", "-");
+            mathematicalExpression = mathematicalExpression.replace(parenthesis, operation)
+                    .replace("+-", "-");
         }
         mathematicalExpression = findeOperations(mathematicalExpression);
 
@@ -22,7 +22,7 @@ public class CalculatorService {
     }
 
 
-    private String findParenthesis(String mathematicalExpression) {
+    public String findParenthesis(String mathematicalExpression) {
         Pattern findBracket = Pattern.compile("\\([\\-]?\\d+(\\.\\d+)?([+\\-\\*\\/][\\-]?\\d+(\\.\\d+)?)+\\)");
         Matcher matcher = findBracket.matcher(mathematicalExpression);
         if (matcher.find())
@@ -53,15 +53,14 @@ public class CalculatorService {
     }
 
     private String executeOperations(Pattern find, String mathematicalExpression) {
-        String operationNew = "";
+        String result = "";
         String operationFound = "";
         Matcher matcher = find.matcher(mathematicalExpression);
         while (matcher.find()) {
             operationFound = matcher.group();
-            operationNew = divisionMathematicalExpression(operationFound);
-            mathematicalExpression = replaceString(mathematicalExpression, operationFound, operationNew);
-            mathematicalExpression = replaceString(mathematicalExpression, "+-", "-");
-
+            result = divisionMathematicalExpression(operationFound);
+            mathematicalExpression = mathematicalExpression.replace(operationFound, result)
+                    .replace("+-", "-");
             matcher = find.matcher(mathematicalExpression);
         }
 
@@ -69,43 +68,38 @@ public class CalculatorService {
     }
 
     private String divisionMathematicalExpression(String mathematicalExpression) {
-        double firstNum = 0;
-        double secondNum = 0;
-        String operation = "";
+        double firstNum;
+        double secondNum;
+        String operationSign = "";
 
         Pattern findBracket = Pattern.compile("[\\-]?\\d+(\\.\\d+)?");
         Matcher matcher = findBracket.matcher(mathematicalExpression);
 
         if (matcher.find()) {
             firstNum = Double.parseDouble(matcher.group(0));
-        }
+        } else return "Not found number";
         if (matcher.find()) {
             secondNum = Double.parseDouble(matcher.group(0));
-        } else return "Not found operation";
+        } else return "Not found number";
         findBracket = Pattern.compile("[\\+|\\-]");
         matcher = findBracket.matcher(mathematicalExpression);
         if (matcher.find()) {
-            operation = matcher.group();
-            operation = operation.replace("-", "+");
+            operationSign = matcher.group().replace("-", "+");
         }
         findBracket = Pattern.compile("\\*");
         matcher = findBracket.matcher(mathematicalExpression);
         if (matcher.find()) {
-            operation = matcher.group();
+            operationSign = matcher.group();
         }
 
         findBracket = Pattern.compile("/");
         matcher = findBracket.matcher(mathematicalExpression);
         if (matcher.find()) {
-            operation = matcher.group();
+            operationSign = matcher.group();
         }
 
-        return String.valueOf(executeOperation(firstNum, secondNum, operation));
+        return String.valueOf(executeOperation(firstNum, secondNum, operationSign));
 
-    }
-
-    private String replaceString(String mathematicalExpression, String oldExpresion, String newException) {
-        return mathematicalExpression.replace(oldExpresion, newException);
     }
 
     double executeOperation(double firstNum, double secondNum, String operation) {
